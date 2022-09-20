@@ -1,4 +1,4 @@
-pokemonList = [
+let pokemonList = [
     {
         name: "Diglett",
         height: 0.08,
