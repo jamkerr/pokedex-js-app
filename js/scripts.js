@@ -10,7 +10,7 @@ let pokemonList = [
         types: ['normal']
     },
     {
-        name: "Farfetch/'d",
+        name: "Farfetch\'d",
         height: 2.07,
         types: ['normal', 'flying']
     },
@@ -25,3 +25,8 @@ let pokemonList = [
         types: ['grass', 'poison']
     }
 ];
+
+// Writes the names and heights of each pokémon to the DOM
+for (let i = 0; i < pokemonList.length; i++) {
+    document.write(`<p>${pokemonList[i].name} (height: ${pokemonList[i].height})</p>`);
+}
