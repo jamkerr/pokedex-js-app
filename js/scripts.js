@@ -29,7 +29,7 @@ let pokemonList = [
 // Writes the names and heights of each pokémon to the DOM
 for (let i = 0; i < pokemonList.length; i++) {
     if (pokemonList[i].height > 3) {
-        document.write(`<p>${pokemonList[i].name} (height: ${pokemonList[i].height}) - Crikey, that's a whopper!</p>`);
+        document.write(`<p>${pokemonList[i].name} (height: ${pokemonList[i].height}) - <em>Crikey, that's a whopper!</em></p>`);
     } else {
         document.write(`<p>${pokemonList[i].name} (height: ${pokemonList[i].height})</p>`);
     }
