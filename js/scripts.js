@@ -46,9 +46,9 @@ let pokemonRespository = (function() {
     }
 
     return {
-        getAll: getAll,
-        add: add,
-        getSpecific: getSpecific
+        getAll,
+        add,
+        getSpecific
     };
 })();
 
