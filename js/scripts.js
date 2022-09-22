@@ -32,7 +32,11 @@ let pokemonRespository = (function() {
     }
 
     function add(newPokemon) {
-        return pokemonList.push(newPokemon)
+        if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(Object.keys(pokemonList[0]))) {
+            return pokemonList.push(newPokemon)
+        } else {
+            console.log(`The pokémon must be stored as an object with the keys: ${Object.keys(pokemonList[0])}.`);
+        }
     }
 
     return {
