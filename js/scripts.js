@@ -31,9 +31,15 @@ let pokemonRespository = (function() {
         return pokemonList;
     }
 
+    function getSpecific(name) {
+        return pokemonList.filter(function(pokemon) {
+            return name === pokemon.name;
+        });
+    }
+
     function add(newPokemon) {
         if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(Object.keys(pokemonList[0]))) {
-            return pokemonList.push(newPokemon)
+            return pokemonList.push(newPokemon);
         } else {
             console.log(`The pokémon must be stored as an object with the keys: ${Object.keys(pokemonList[0])}.`);
         }
@@ -41,7 +47,8 @@ let pokemonRespository = (function() {
 
     return {
         getAll: getAll,
-        add: add
+        add: add,
+        getSpecific: getSpecific
     };
 })();
 
