@@ -49,7 +49,11 @@ let pokemonRespository = (function() {
         let htmlList = document.querySelector('ul');
         let listItem = document.createElement('li');
         let button = document.createElement('button');
-        button.innerText = `${pokemon.name}`;
+        if (pokemon.height > 3) {
+            button.innerText = `${pokemon.name}\nCrikey, that's a whopper!`;
+        } else {
+            button.innerText = `${pokemon.name}`;
+        }
         button.classList.add('pokemon-list__pokemon-card');
         listItem.appendChild(button);
         htmlList.appendChild(listItem);
