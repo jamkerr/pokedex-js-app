@@ -30,3 +30,11 @@ p {
 .header__logo {
     max-width: 100px;
 }
+
+.pokemon-list {
+    list-style-type: none;
+}
+
+.pokemon-list__pokemon-card {
+    background-color: aquamarine;
+}
