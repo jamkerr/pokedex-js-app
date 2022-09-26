@@ -45,6 +45,19 @@ let pokemonRespository = (function() {
         }
     }
 
+    // Function to show item details (used for button)
+    function showDetails(pokemon) {
+        console.log(pokemon);
+    }
+
+    // Function to add click event to show item details
+    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
+    function addEvent(targetElement, item) {
+        targetElement.addEventListener('click', function(){
+            showDetails(item);
+        });
+    }
+
     function addListItem(pokemon) {
         let htmlList = document.querySelector('ul');
         let listItem = document.createElement('li');
@@ -55,6 +68,9 @@ let pokemonRespository = (function() {
             button.innerText = `${pokemon.name}`;
         }
         button.classList.add('pokemon-list__pokemon-card');
+        // Add click event to button to show item details.
+        addEvent(button, pokemon);
+
         listItem.appendChild(button);
         htmlList.appendChild(listItem);
     }
