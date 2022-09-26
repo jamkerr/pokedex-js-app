@@ -45,18 +45,47 @@ let pokemonRespository = (function() {
         }
     }
 
+    // Function to show item details (used for button)
+    function showDetails(pokemon) {
+        console.log(pokemon);
+    }
+
+    // Function to add click event to show item details
+    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
+    function addEvent(targetElement, item) {
+        targetElement.addEventListener('click', function(){
+            showDetails(item);
+        });
+    }
+
+    function addListItem(pokemon) {
+        let htmlList = document.querySelector('ul');
+        let listItem = document.createElement('li');
+        let button = document.createElement('button');
+        if (pokemon.height > 3) {
+            button.innerText = `${pokemon.name}\nCrikey, that's a whopper!`;
+        } else {
+            button.innerText = `${pokemon.name}`;
+        }
+        button.classList.add('pokemon-list__pokemon-card');
+        // Add click event to button to show item details.
+        addEvent(button, pokemon);
+
+        listItem.appendChild(button);
+        htmlList.appendChild(listItem);
+    }
+
     return {
         getAll,
         add,
-        getSpecific
+        getSpecific,
+        addListItem
     };
 })();
 
 // Writes the names and heights of each pokémon to the DOM
 pokemonRespository.getAll().forEach(function(pokemon) {
-    if (pokemon.height > 3) {
-        document.write(`<p>${pokemon.name} (height: ${pokemon.height}) - <em>Crikey, that's a whopper!</em></p>`);
-    } else {
-        document.write(`<p>${pokemon.name} (height: ${pokemon.height})</p>`);
-    }
+
+    pokemonRespository.addListItem(pokemon);
+
 });
