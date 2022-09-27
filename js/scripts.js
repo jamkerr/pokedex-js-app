@@ -43,11 +43,7 @@ let pokemonRespository = (function() {
         let htmlList = document.querySelector('ul');
         let listItem = document.createElement('li');
         let button = document.createElement('button');
-        if (pokemon.height > 3) {
-            button.innerText = `${pokemon.name}\nCrikey, that's a whopper!`;
-        } else {
-            button.innerText = `${pokemon.name}`;
-        }
+        button.innerText = `${pokemon.name}`;
         button.classList.add('pokemon-list__pokemon-card');
         // Add click event to button to show item details.
         addEvent(button, pokemon);
@@ -61,7 +57,8 @@ let pokemonRespository = (function() {
         showLoadingMessage();
         return fetch(apiUrl).then(function (response) {
             return response.json();
-        }).then(function (json) {
+        })
+        .then(function (json) {
             hideLoadingMessage();
             json.results.forEach(function (item) {
                 let pokemon = {
@@ -71,7 +68,8 @@ let pokemonRespository = (function() {
                 };
                 addEntry(pokemon);
             });
-        }).catch(function (e) {
+        })
+        .catch(function (e) {
             hideLoadingMessage();
             console.error(e);
         })
@@ -81,14 +79,17 @@ let pokemonRespository = (function() {
     function loadDetails(item) {
         showLoadingMessage();
         let url = item.detailsUrl;
-        return fetch(url).then(function (response) {
+        return fetch(url)
+        .then(function (response) {
             return response.json();
-        }).then(function (details) {
+        })
+        .then(function (details) {
             hideLoadingMessage();
             item.imageUrl = details.sprites.front_default;
             item.height = details.height;
             item.types = details.types;
-        }).catch(function (e) {
+        })
+        .catch(function (e) {
             hideLoadingMessage();
             console.error(e);
         });
