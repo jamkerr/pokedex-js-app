@@ -1,31 +1,8 @@
 let pokemonRespository = (function() {
-    let pokemonList = [
-        {
-            name: "Diglett",
-            height: 0.08,
-            types: ['ground']
-        },
-        {
-            name: "Lickitung",
-            height: 3.11,
-            types: ['normal']
-        },
-        {
-            name: "Farfetch\'d",
-            height: 2.07,
-            types: ['normal', 'flying']
-        },
-        {
-            name: "Jigglypuff",
-            height: 1.08,
-            types: ['normal', 'fairy']
-        },
-        {
-            name: "Oddish",
-            height: 1.08,
-            types: ['grass', 'poison']
-        }
-    ];
+    let pokemonList = [];
+    // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
+    let objectKeys = ["name", "detailsUrl"];
+    let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
     function getAll() {
         return pokemonList;
@@ -37,8 +14,10 @@ let pokemonRespository = (function() {
         });
     }
 
-    function add(newPokemon) {
-        if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(Object.keys(pokemonList[0]))) {
+    // Adds pokémon entry to pokemonList
+    function addEntry(newPokemon) {
+        // Checks whether the entry is an object and includes the expected keys
+        if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(objectKeys)) {
             return pokemonList.push(newPokemon);
         } else {
             console.log(`The pokémon must be stored as an object with the keys: ${Object.keys(pokemonList[0])}.`);
@@ -47,7 +26,9 @@ let pokemonRespository = (function() {
 
     // Function to show item details (used for button)
     function showDetails(pokemon) {
-        console.log(pokemon);
+        loadDetails(pokemon).then(function() {
+            console.log(pokemon);
+        });
     }
 
     // Function to add click event to show item details
@@ -75,17 +56,53 @@ let pokemonRespository = (function() {
         htmlList.appendChild(listItem);
     }
 
+    // Loads the name and link to more details for each pokémon
+    function loadList() {
+        return fetch(apiUrl).then(function (response) {
+            return response.json();
+        }).then(function (json) {
+            json.results.forEach(function (item) {
+                let pokemon = {
+                    // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
+                    name: item.name,
+                    detailsUrl: item.url
+                };
+                addEntry(pokemon);
+            });
+        }).catch(function (e) {
+            console.error(e);
+        })
+    }
+
+    // Loads extra details for each pokémon
+    function loadDetails(item) {
+        let url = item.detailsUrl;
+        return fetch(url).then(function (response) {
+            return response.json();
+        }).then(function (details) {
+            item.imageUrl = details.sprites.front_default;
+            item.height = details.height;
+            item.types = details.types;
+        }).catch(function (e) {
+            console.error(e);
+        });
+    }
+
     return {
         getAll,
-        add,
+        addEntry,
         getSpecific,
-        addListItem
+        addListItem,
+        loadList,
+        loadDetails
     };
 })();
 
-// Writes the names and heights of each pokémon to the DOM
-pokemonRespository.getAll().forEach(function(pokemon) {
+// Writes the names of each pokémon to the DOM
+pokemonRespository.loadList().then(function () {
+    pokemonRespository.getAll().forEach(function(pokemon) {
 
-    pokemonRespository.addListItem(pokemon);
-
-});
+        pokemonRespository.addListItem(pokemon);
+    
+    });
+})
