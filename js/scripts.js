@@ -58,9 +58,11 @@ let pokemonRespository = (function() {
 
     // Loads the name and link to more details for each pokémon
     function loadList() {
+        showLoadingMessage();
         return fetch(apiUrl).then(function (response) {
             return response.json();
         }).then(function (json) {
+            hideLoadingMessage();
             json.results.forEach(function (item) {
                 let pokemon = {
                     // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
@@ -70,22 +72,42 @@ let pokemonRespository = (function() {
                 addEntry(pokemon);
             });
         }).catch(function (e) {
+            hideLoadingMessage();
             console.error(e);
         })
     }
 
     // Loads extra details for each pokémon
     function loadDetails(item) {
+        showLoadingMessage();
         let url = item.detailsUrl;
         return fetch(url).then(function (response) {
             return response.json();
         }).then(function (details) {
+            hideLoadingMessage();
             item.imageUrl = details.sprites.front_default;
             item.height = details.height;
             item.types = details.types;
         }).catch(function (e) {
+            hideLoadingMessage();
             console.error(e);
         });
+    }
+
+    // Shows loading message when entry or details are being fetched
+    function showLoadingMessage() {
+        let mainContent = document.querySelector('main');
+        let messageElement = document.createElement('p');
+        messageElement.innerText = `Loading the Pokédex`;
+        messageElement.classList.add('loading-message');
+        // Add click event to button to show item details.
+        mainContent.appendChild(messageElement);
+    }
+
+    // Hides loading message after entry or details have been fetched
+    function hideLoadingMessage() {
+        let messageElement = document.querySelector('.loading-message');
+        messageElement.parentElement.removeChild(messageElement);
     }
 
     return {
