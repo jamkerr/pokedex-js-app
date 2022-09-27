@@ -1,31 +1,15 @@
 let pokemonRespository = (function() {
-    let pokemonList = [
-        {
-            name: "Diglett",
-            height: 0.08,
-            types: ['ground']
-        },
-        {
-            name: "Lickitung",
-            height: 3.11,
-            types: ['normal']
-        },
-        {
-            name: "Farfetch\'d",
-            height: 2.07,
-            types: ['normal', 'flying']
-        },
-        {
-            name: "Jigglypuff",
-            height: 1.08,
-            types: ['normal', 'fairy']
-        },
-        {
-            name: "Oddish",
-            height: 1.08,
-            types: ['grass', 'poison']
-        }
-    ];
+    let pokemonList = [];
+    // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
+    let objectKeys = ["name", "detailsUrl"];
+    let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
+
+    // Helper function to check whether required keys are in each pokémon object
+    function requiredKeys(pokemon, keys) {
+        return keys.some(function (key) {
+            return key in pokemon
+        });
+    }
 
     function getAll() {
         return pokemonList;
@@ -37,17 +21,21 @@ let pokemonRespository = (function() {
         });
     }
 
-    function add(newPokemon) {
-        if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(Object.keys(pokemonList[0]))) {
+    // Adds pokémon entry to pokemonList
+    function addEntry(newPokemon) {
+        // Checks whether the entry is an object and includes the expected keys
+        if (typeof newPokemon === "object" && requiredKeys(newPokemon, objectKeys)) {
             return pokemonList.push(newPokemon);
         } else {
-            console.log(`The pokémon must be stored as an object with the keys: ${Object.keys(pokemonList[0])}.`);
+            console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
         }
     }
 
     // Function to show item details (used for button)
     function showDetails(pokemon) {
-        console.log(pokemon);
+        loadDetails(pokemon).then(function() {
+            console.log(pokemon);
+        });
     }
 
     // Function to add click event to show item details
@@ -62,11 +50,7 @@ let pokemonRespository = (function() {
         let htmlList = document.querySelector('ul');
         let listItem = document.createElement('li');
         let button = document.createElement('button');
-        if (pokemon.height > 3) {
-            button.innerText = `${pokemon.name}\nCrikey, that's a whopper!`;
-        } else {
-            button.innerText = `${pokemon.name}`;
-        }
+        button.innerText = `${pokemon.name}`;
         button.classList.add('pokemon-list__pokemon-card');
         // Add click event to button to show item details.
         addEvent(button, pokemon);
@@ -75,17 +59,80 @@ let pokemonRespository = (function() {
         htmlList.appendChild(listItem);
     }
 
+    // Loads the name and link to more details for each pokémon
+    function loadList() {
+        showLoadingMessage();
+        return fetch(apiUrl).then(function (response) {
+            return response.json();
+        })
+        .then(function (json) {
+            hideLoadingMessage();
+            json.results.forEach(function (item) {
+                let pokemon = {
+                    // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
+                    name: item.name,
+                    detailsUrl: item.url
+                };
+                addEntry(pokemon);
+            });
+        })
+        .catch(function (e) {
+            console.error(e);
+            hideLoadingMessage();
+        })
+    }
+
+    // Loads extra details for each pokémon
+    function loadDetails(item) {
+        showLoadingMessage();
+        let url = item.detailsUrl;
+        return fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (details) {
+            hideLoadingMessage();
+            item.imageUrl = details.sprites.front_default;
+            item.height = details.height;
+            item.types = details.types;
+        })
+        .catch(function (e) {
+            hideLoadingMessage();
+            console.error(e);
+        });
+    }
+
+    // Shows loading message when entry or details are being fetched
+    function showLoadingMessage() {
+        let mainContent = document.querySelector('main');
+        let messageElement = document.createElement('p');
+        messageElement.innerText = `Loading the Pokédex`;
+        messageElement.classList.add('loading-message');
+        // Add click event to button to show item details.
+        mainContent.appendChild(messageElement);
+    }
+
+    // Hides loading message after entry or details have been fetched
+    function hideLoadingMessage() {
+        let messageElement = document.querySelector('.loading-message');
+        messageElement.parentElement.removeChild(messageElement);
+    }
+
     return {
         getAll,
-        add,
+        addEntry,
         getSpecific,
-        addListItem
+        addListItem,
+        loadList,
+        loadDetails
     };
 })();
 
-// Writes the names and heights of each pokémon to the DOM
-pokemonRespository.getAll().forEach(function(pokemon) {
+// Writes the names of each pokémon to the DOM
+pokemonRespository.loadList().then(function () {
+    pokemonRespository.getAll().forEach(function(pokemon) {
 
-    pokemonRespository.addListItem(pokemon);
-
-});
+        pokemonRespository.addListItem(pokemon);
+    
+    });
+})
