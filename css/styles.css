@@ -58,3 +58,7 @@ p {
     border: none;
     padding: 20px;
 }
+
+.pokemon-list__pokemon-card:hover {
+    cursor: pointer;
+}
