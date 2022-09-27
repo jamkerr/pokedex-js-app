@@ -4,6 +4,13 @@ let pokemonRespository = (function() {
     let objectKeys = ["name", "detailsUrl"];
     let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
+    // Helper function to check whether required keys are in each pokémon object
+    function requiredKeys(pokemon, keys) {
+        return keys.some(function (key) {
+            return key in pokemon
+        });
+    }
+
     function getAll() {
         return pokemonList;
     }
@@ -17,10 +24,10 @@ let pokemonRespository = (function() {
     // Adds pokémon entry to pokemonList
     function addEntry(newPokemon) {
         // Checks whether the entry is an object and includes the expected keys
-        if (typeof newPokemon === "object" && JSON.stringify(Object.keys(newPokemon)) === JSON.stringify(objectKeys)) {
+        if (typeof newPokemon === "object" && requiredKeys(newPokemon, objectKeys)) {
             return pokemonList.push(newPokemon);
         } else {
-            console.log(`The pokémon must be stored as an object with the keys: ${Object.keys(pokemonList[0])}.`);
+            console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
         }
     }
 
@@ -70,8 +77,8 @@ let pokemonRespository = (function() {
             });
         })
         .catch(function (e) {
-            hideLoadingMessage();
             console.error(e);
+            hideLoadingMessage();
         })
     }
 
