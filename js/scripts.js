@@ -1,3 +1,66 @@
+// Modal behaviour to show pokémon details
+let detailsModal = (function() {
+    // Hides modal to close details
+    function hideModal() {
+        let modalContainer = document.querySelector('#modal-container');
+        modalContainer.classList.remove('is-visible');
+    }
+    
+    // Shows modal to view details
+    function showModal(pokemon) {
+        let modalContainer = document.querySelector('#modal-container');
+
+        let modalContent = document.querySelector('.modal-content');
+        modalContent.innerHTML = '';
+
+        // Create title
+        let titleElement = document.createElement('h1');
+        titleElement.innerText = pokemon.name;
+
+        // Create text content
+        let contentElement = document.createElement('p');
+        contentElement.innerText = pokemon.height;
+
+        // Create image
+        let imageElement = document.createElement('img');
+        imageElement.src = pokemon.imageUrl;
+
+        // Add title, text, and image to DOM
+        modalContent.appendChild(titleElement);
+        modalContent.appendChild(contentElement);
+        modalContent.appendChild(imageElement);
+
+        modalContainer.classList.add('is-visible');
+
+        // Event listener to close modal when "close" button is pressed
+        let closeButtonElement = document.querySelector('.modal-close');
+        closeButtonElement.addEventListener('click', hideModal);
+
+        // Event listener to close modal when clicking outside the modal
+        modalContainer.addEventListener('click', (e) => {
+            let target = e.target;
+            if (target === modalContainer) {
+                hideModal();
+            }
+        });
+    }
+
+    // Event listener to hide modal when it's open and the escape key is pressed
+    window.addEventListener('keydown', (e) => {
+        let modalContainer = document.querySelector('#modal-container');
+        if (e.key === 'Escape' && modalContainer.classList.contains('is-visible')) {
+            hideModal();
+        }
+    });
+
+    return {
+        showModal,
+        hideModal
+    }
+
+})();
+
+
 let pokemonRespository = (function() {
     let pokemonList = [];
     // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
@@ -30,33 +93,21 @@ let pokemonRespository = (function() {
             console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
         }
     }
-
-    // Function to show item details (used for button)
-    function showDetails(pokemon) {
-        loadDetails(pokemon).then(function() {
-            console.log(pokemon);
-        });
-    }
-
-    // Function to add click event to show item details
-    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
-    function addEvent(targetElement, item) {
-        targetElement.addEventListener('click', function(){
-            showDetails(item);
-        });
-    }
-
-    function addListItem(pokemon) {
-        let htmlList = document.querySelector('ul');
-        let listItem = document.createElement('li');
-        let button = document.createElement('button');
-        button.innerText = `${pokemon.name}`;
-        button.classList.add('pokemon-list__pokemon-card');
+    
+    // Shows loading message when entry or details are being fetched
+    function showLoadingMessage() {
+        let mainContent = document.querySelector('main');
+        let messageElement = document.createElement('p');
+        messageElement.innerText = `Loading the Pokédex`;
+        messageElement.classList.add('loading-message');
         // Add click event to button to show item details.
-        addEvent(button, pokemon);
+        mainContent.appendChild(messageElement);
+    }
 
-        listItem.appendChild(button);
-        htmlList.appendChild(listItem);
+    // Hides loading message after entry or details have been fetched
+    function hideLoadingMessage() {
+        let messageElement = document.querySelector('.loading-message');
+        messageElement.parentElement.removeChild(messageElement);
     }
 
     // Loads the name and link to more details for each pokémon
@@ -82,7 +133,7 @@ let pokemonRespository = (function() {
         })
     }
 
-    // Loads extra details for each pokémon
+    // Loads extra details for a pokémon
     function loadDetails(item) {
         showLoadingMessage();
         let url = item.detailsUrl;
@@ -102,29 +153,39 @@ let pokemonRespository = (function() {
         });
     }
 
-    // Shows loading message when entry or details are being fetched
-    function showLoadingMessage() {
-        let mainContent = document.querySelector('main');
-        let messageElement = document.createElement('p');
-        messageElement.innerText = `Loading the Pokédex`;
-        messageElement.classList.add('loading-message');
-        // Add click event to button to show item details.
-        mainContent.appendChild(messageElement);
+    // Function to show item details (used for button)
+    function showDetails(pokemon) {
+        loadDetails(pokemon).then(function() {
+            detailsModal.showModal(pokemon);
+        });
     }
 
-    // Hides loading message after entry or details have been fetched
-    function hideLoadingMessage() {
-        let messageElement = document.querySelector('.loading-message');
-        messageElement.parentElement.removeChild(messageElement);
+    // Function to add click event to show item details
+    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
+    function addEvent(targetElement, item) {
+        targetElement.addEventListener('click', function(){
+            showDetails(item);
+        });
+    }
+
+    // Creates the button for each pokémon
+    function addListItem(pokemon) {
+        let htmlList = document.querySelector('ul');
+        let listItem = document.createElement('li');
+        let button = document.createElement('button');
+        button.innerText = `${pokemon.name}`;
+        button.classList.add('pokemon-list__pokemon-card');
+        // Add click event to button to show item details.
+        addEvent(button, pokemon);
+
+        listItem.appendChild(button);
+        htmlList.appendChild(listItem);
     }
 
     return {
-        getAll,
-        addEntry,
-        getSpecific,
         addListItem,
         loadList,
-        loadDetails
+        getAll
     };
 })();
 
@@ -135,4 +196,7 @@ pokemonRespository.loadList().then(function () {
         pokemonRespository.addListItem(pokemon);
     
     });
-})
+});
+
+
+
