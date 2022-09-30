@@ -24,7 +24,6 @@ let detailsModal = (function() {
         // Create types element
         let typeElement = document.createElement('p');
         typeElement.innerText = `Type: ${pokemon.types}`;
-        console.log(pokemon.types);
 
         // Create image
         let imageElement = document.createElement('img');
@@ -32,10 +31,10 @@ let detailsModal = (function() {
 
         // Add title, text, and image to DOM
         modalContent.appendChild(titleElement);
-        modalContent.appendChild(heightElement);
-        modalContent.appendChild(typeElement);
         modalContent.appendChild(imageElement);
-
+        modalContent.appendChild(typeElement);
+        modalContent.appendChild(heightElement);
+    
         modalContainer.classList.add('is-visible');
 
         // Event listener to close modal when "close" button is pressed

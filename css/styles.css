@@ -85,7 +85,6 @@ p {
 
     /* this is used to center the modal */
     display: grid;
-    text-align: center;
 }
 
 .modal {
@@ -114,4 +113,17 @@ p {
 
 .modal p {
     margin-bottom: 0;
+}
+
+.modal img {
+    float: right;
+}
+
+
+/* RESPONSIVE */
+@media all and (max-width: 500px) {
+    .modal img {
+        float: none;
+        margin-bottom: 0;
+    }
 }
