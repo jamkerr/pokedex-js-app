@@ -17,9 +17,14 @@ let detailsModal = (function() {
         let titleElement = document.createElement('h1');
         titleElement.innerText = pokemon.name;
 
-        // Create text content
-        let contentElement = document.createElement('p');
-        contentElement.innerText = pokemon.height;
+        // Create height content
+        let heightElement = document.createElement('p');
+        heightElement.innerText = `Height: ${pokemon.height * 10} cm`;
+
+        // Create types element
+        let typeElement = document.createElement('p');
+        typeElement.innerText = `Type: ${pokemon.types}`;
+        console.log(pokemon.types);
 
         // Create image
         let imageElement = document.createElement('img');
@@ -27,7 +32,8 @@ let detailsModal = (function() {
 
         // Add title, text, and image to DOM
         modalContent.appendChild(titleElement);
-        modalContent.appendChild(contentElement);
+        modalContent.appendChild(heightElement);
+        modalContent.appendChild(typeElement);
         modalContent.appendChild(imageElement);
 
         modalContainer.classList.add('is-visible');
@@ -72,6 +78,11 @@ let pokemonRespository = (function() {
         return keys.some(function (key) {
             return key in pokemon
         });
+    }
+
+    // Helper function to capitalize first letter of pokémon names
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     function getAll() {
@@ -121,7 +132,7 @@ let pokemonRespository = (function() {
             json.results.forEach(function (item) {
                 let pokemon = {
                     // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
-                    name: item.name,
+                    name: capitalizeFirstLetter(item.name),
                     detailsUrl: item.url
                 };
                 addEntry(pokemon);
@@ -143,9 +154,18 @@ let pokemonRespository = (function() {
         })
         .then(function (details) {
             hideLoadingMessage();
+            // Helper function to extract type info
+            function getTypes(typesObject){
+                let typesArray = [];
+                typesObject.forEach(function(item) {
+                    typesArray.push(item.type.name);
+                    
+                });
+                return typesArray;
+            }
             item.imageUrl = details.sprites.front_default;
             item.height = details.height;
-            item.types = details.types;
+            item.types = getTypes(details.types);
         })
         .catch(function (e) {
             hideLoadingMessage();
