@@ -107,6 +107,10 @@ p {
     text-decoration: underline;
 }
 
+.modal-close:hover {
+    cursor: pointer;
+}
+
 .modal h1 {
     margin-top: 0;
 }
