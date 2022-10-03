@@ -9,9 +9,24 @@ let detailsModal = (function() {
     // Shows modal to view details
     function showModal(pokemon) {
         let modalContainer = document.querySelector('#modal-container');
+        modalContainer.innerHTML = '';
 
-        let modalContent = document.querySelector('.modal-content');
-        modalContent.innerHTML = '';
+        let modal = document.createElement('div');
+        modal.classList.add('modal');
+
+        let closeButtonElement = document.createElement('button');
+        closeButtonElement.classList.add('modal-close');
+        closeButtonElement.innerText = 'Close';
+        // Event listener to close modal when "close" button is pressed
+        closeButtonElement.addEventListener('click', hideModal);
+
+        // Event listener to close modal when clicking outside the modal
+        modalContainer.addEventListener('click', (e) => {
+            let target = e.target;
+            if (target === modalContainer) {
+                hideModal();
+            }
+        });
 
         // Create title
         let titleElement = document.createElement('h1');
@@ -30,24 +45,14 @@ let detailsModal = (function() {
         imageElement.src = pokemon.imageUrl;
 
         // Add title, text, and image to DOM
-        modalContent.appendChild(titleElement);
-        modalContent.appendChild(imageElement);
-        modalContent.appendChild(typeElement);
-        modalContent.appendChild(heightElement);
+        modal.appendChild(closeButtonElement);
+        modal.appendChild(titleElement);
+        modal.appendChild(imageElement);
+        modal.appendChild(typeElement);
+        modal.appendChild(heightElement);
+        modalContainer.appendChild(modal);
     
         modalContainer.classList.add('is-visible');
-
-        // Event listener to close modal when "close" button is pressed
-        let closeButtonElement = document.querySelector('.modal-close');
-        closeButtonElement.addEventListener('click', hideModal);
-
-        // Event listener to close modal when clicking outside the modal
-        modalContainer.addEventListener('click', (e) => {
-            let target = e.target;
-            if (target === modalContainer) {
-                hideModal();
-            }
-        });
     }
 
     // Event listener to hide modal when it's open and the escape key is pressed
