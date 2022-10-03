@@ -1,3 +1,76 @@
+// Modal behaviour to show pokémon details
+let detailsModal = (function() {
+    // Hides modal to close details
+    function hideModal() {
+        let modalContainer = document.querySelector('#modal-container');
+        modalContainer.classList.remove('is-visible');
+    }
+    
+    // Shows modal to view details
+    function showModal(pokemon) {
+        let modalContainer = document.querySelector('#modal-container');
+        modalContainer.innerHTML = '';
+
+        let modal = document.createElement('div');
+        modal.classList.add('modal');
+
+        let closeButtonElement = document.createElement('button');
+        closeButtonElement.classList.add('modal-close');
+        closeButtonElement.innerText = 'Close';
+        // Event listener to close modal when "close" button is pressed
+        closeButtonElement.addEventListener('click', hideModal);
+
+        // Event listener to close modal when clicking outside the modal
+        modalContainer.addEventListener('click', (e) => {
+            let target = e.target;
+            if (target === modalContainer) {
+                hideModal();
+            }
+        });
+
+        // Create title
+        let titleElement = document.createElement('h1');
+        titleElement.innerText = pokemon.name;
+
+        // Create height content
+        let heightElement = document.createElement('p');
+        heightElement.innerText = `Height: ${pokemon.height * 10} cm`;
+
+        // Create types element
+        let typeElement = document.createElement('p');
+        typeElement.innerText = `Type: ${pokemon.types}`;
+
+        // Create image
+        let imageElement = document.createElement('img');
+        imageElement.src = pokemon.imageUrl;
+
+        // Add title, text, and image to DOM
+        modal.appendChild(closeButtonElement);
+        modal.appendChild(titleElement);
+        modal.appendChild(imageElement);
+        modal.appendChild(typeElement);
+        modal.appendChild(heightElement);
+        modalContainer.appendChild(modal);
+    
+        modalContainer.classList.add('is-visible');
+    }
+
+    // Event listener to hide modal when it's open and the escape key is pressed
+    window.addEventListener('keydown', (e) => {
+        let modalContainer = document.querySelector('#modal-container');
+        if (e.key === 'Escape' && modalContainer.classList.contains('is-visible')) {
+            hideModal();
+        }
+    });
+
+    return {
+        showModal,
+        hideModal
+    }
+
+})();
+
+
 let pokemonRespository = (function() {
     let pokemonList = [];
     // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
@@ -9,6 +82,11 @@ let pokemonRespository = (function() {
         return keys.some(function (key) {
             return key in pokemon
         });
+    }
+
+    // Helper function to capitalize first letter of pokémon names
+    function capitalizeFirstLetter(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
     function getAll() {
@@ -30,78 +108,7 @@ let pokemonRespository = (function() {
             console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
         }
     }
-
-    // Function to show item details (used for button)
-    function showDetails(pokemon) {
-        loadDetails(pokemon).then(function() {
-            console.log(pokemon);
-        });
-    }
-
-    // Function to add click event to show item details
-    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
-    function addEvent(targetElement, item) {
-        targetElement.addEventListener('click', function(){
-            showDetails(item);
-        });
-    }
-
-    function addListItem(pokemon) {
-        let htmlList = document.querySelector('ul');
-        let listItem = document.createElement('li');
-        let button = document.createElement('button');
-        button.innerText = `${pokemon.name}`;
-        button.classList.add('pokemon-list__pokemon-card');
-        // Add click event to button to show item details.
-        addEvent(button, pokemon);
-
-        listItem.appendChild(button);
-        htmlList.appendChild(listItem);
-    }
-
-    // Loads the name and link to more details for each pokémon
-    function loadList() {
-        showLoadingMessage();
-        return fetch(apiUrl).then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            hideLoadingMessage();
-            json.results.forEach(function (item) {
-                let pokemon = {
-                    // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
-                    name: item.name,
-                    detailsUrl: item.url
-                };
-                addEntry(pokemon);
-            });
-        })
-        .catch(function (e) {
-            console.error(e);
-            hideLoadingMessage();
-        })
-    }
-
-    // Loads extra details for each pokémon
-    function loadDetails(item) {
-        showLoadingMessage();
-        let url = item.detailsUrl;
-        return fetch(url)
-        .then(function (response) {
-            return response.json();
-        })
-        .then(function (details) {
-            hideLoadingMessage();
-            item.imageUrl = details.sprites.front_default;
-            item.height = details.height;
-            item.types = details.types;
-        })
-        .catch(function (e) {
-            hideLoadingMessage();
-            console.error(e);
-        });
-    }
-
+    
     // Shows loading message when entry or details are being fetched
     function showLoadingMessage() {
         let mainContent = document.querySelector('main');
@@ -118,13 +125,91 @@ let pokemonRespository = (function() {
         messageElement.parentElement.removeChild(messageElement);
     }
 
+    // Loads the name and link to more details for each pokémon
+    function loadList() {
+        showLoadingMessage();
+        return fetch(apiUrl).then(function (response) {
+            return response.json();
+        })
+        .then(function (json) {
+            hideLoadingMessage();
+            json.results.forEach(function (item) {
+                let pokemon = {
+                    // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
+                    name: capitalizeFirstLetter(item.name),
+                    detailsUrl: item.url
+                };
+                addEntry(pokemon);
+            });
+        })
+        .catch(function (e) {
+            console.error(e);
+            hideLoadingMessage();
+        })
+    }
+
+    // Loads extra details for a pokémon
+    function loadDetails(item) {
+        showLoadingMessage();
+        let url = item.detailsUrl;
+        return fetch(url)
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (details) {
+            hideLoadingMessage();
+            // Helper function to extract type info
+            function getTypes(typesObject){
+                let typesArray = [];
+                typesObject.forEach(function(item) {
+                    typesArray.push(item.type.name);
+                    
+                });
+                return typesArray;
+            }
+            item.imageUrl = details.sprites.front_default;
+            item.height = details.height;
+            item.types = getTypes(details.types);
+        })
+        .catch(function (e) {
+            hideLoadingMessage();
+            console.error(e);
+        });
+    }
+
+    // Function to show item details (used for button)
+    function showDetails(pokemon) {
+        loadDetails(pokemon).then(function() {
+            detailsModal.showModal(pokemon);
+        });
+    }
+
+    // Function to add click event to show item details
+    // It's necessary to wrap the called function in an extra "reference" function because it contains a parameter, which causes it to be executed immediately: https://stackoverflow.com/questions/35667267/addeventlistenerclick-firing-immediately
+    function addEvent(targetElement, item) {
+        targetElement.addEventListener('click', function(){
+            showDetails(item);
+        });
+    }
+
+    // Creates the button for each pokémon
+    function addListItem(pokemon) {
+        let htmlList = document.querySelector('ul');
+        let listItem = document.createElement('li');
+        let button = document.createElement('button');
+        button.innerText = `${pokemon.name}`;
+        button.classList.add('pokemon-list__pokemon-card');
+        // Add click event to button to show item details.
+        addEvent(button, pokemon);
+
+        listItem.appendChild(button);
+        htmlList.appendChild(listItem);
+    }
+
     return {
-        getAll,
-        addEntry,
-        getSpecific,
         addListItem,
         loadList,
-        loadDetails
+        getAll
     };
 })();
 
@@ -135,4 +220,7 @@ pokemonRespository.loadList().then(function () {
         pokemonRespository.addListItem(pokemon);
     
     });
-})
+});
+
+
+
