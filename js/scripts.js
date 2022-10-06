@@ -1,36 +1,18 @@
 // Modal behaviour to show pokémon details
 let detailsModal = (function() {
-    // Hides modal to close details
-    function hideModal() {
-        let modalContainer = document.querySelector('#modal-container');
-        modalContainer.classList.remove('is-visible');
-    }
     
     // Shows modal to view details
     function showModal(pokemon) {
-        let modalContainer = document.querySelector('#modal-container');
-        modalContainer.innerHTML = '';
 
-        let modal = document.createElement('div');
-        modal.classList.add('modal');
+        let modalTitle = document.querySelector('.modal-title');
+        let modalBody = document.querySelector('.modal-body');
+        let modalFooter = document.querySelector('.modal-footer');
 
-        let closeButtonElement = document.createElement('button');
-        closeButtonElement.classList.add('modal-close');
-        closeButtonElement.innerText = 'Close';
-        // Event listener to close modal when "close" button is pressed
-        closeButtonElement.addEventListener('click', hideModal);
-
-        // Event listener to close modal when clicking outside the modal
-        modalContainer.addEventListener('click', (e) => {
-            let target = e.target;
-            if (target === modalContainer) {
-                hideModal();
-            }
-        });
+        modalBody.innerHTML = '';
+        modalFooter.innerHTML = '';
 
         // Create title
-        let titleElement = document.createElement('h1');
-        titleElement.innerText = pokemon.name;
+        modalTitle.innerText = pokemon.name;
 
         // Create height content
         let heightElement = document.createElement('p');
@@ -45,33 +27,19 @@ let detailsModal = (function() {
         imageElement.src = pokemon.imageUrl;
 
         // Add title, text, and image to DOM
-        modal.appendChild(closeButtonElement);
-        modal.appendChild(titleElement);
-        modal.appendChild(imageElement);
-        modal.appendChild(typeElement);
-        modal.appendChild(heightElement);
-        modalContainer.appendChild(modal);
-    
-        modalContainer.classList.add('is-visible');
+        modalBody.appendChild(imageElement);
+        modalBody.appendChild(typeElement);
+        modalBody.appendChild(heightElement);
     }
 
-    // Event listener to hide modal when it's open and the escape key is pressed
-    window.addEventListener('keydown', (e) => {
-        let modalContainer = document.querySelector('#modal-container');
-        if (e.key === 'Escape' && modalContainer.classList.contains('is-visible')) {
-            hideModal();
-        }
-    });
-
     return {
-        showModal,
-        hideModal
+        showModal
     }
 
 })();
 
 
-let pokemonRespository = (function() {
+let pokemonRepository = (function() {
     let pokemonList = [];
     // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
     let objectKeys = ["name", "detailsUrl"];
@@ -167,9 +135,13 @@ let pokemonRespository = (function() {
                 });
                 return typesArray;
             }
+            item.name = capitalizeFirstLetter(details.name);
             item.imageUrl = details.sprites.front_default;
             item.height = details.height;
+            item.weight = details.weight;
             item.types = getTypes(details.types);
+            item.id = details.id;
+            item.mainType = item.types[0];
         })
         .catch(function (e) {
             hideLoadingMessage();
@@ -192,33 +164,43 @@ let pokemonRespository = (function() {
         });
     }
 
-    // Creates the button for each pokémon
+    // Create the list of buttons for each pokémon
     function addListItem(pokemon) {
-        let htmlList = document.querySelector('ul');
-        let listItem = document.createElement('li');
-        listItem.classList.add('group-list-item');
+        // Select the list element
+        let htmlList = document.querySelector('.pokemon-list');
+
+        // Create the button for each entry
         let button = document.createElement('button');
         button.innerText = `${pokemon.name}`;
-        button.classList.add('pokemon-list__pokemon-card','btn');
+        button.classList.add(
+            'pokemon-list__pokemon-card',
+            'btn',
+            'col-12',
+            'col-md-4',
+            'col-lg-3'
+            );
+        button.setAttribute('data-toggle', 'modal');
+        button.setAttribute('data-target', '#pokemodal');
+
         // Add click event to button to show item details.
         addEvent(button, pokemon);
 
-        listItem.appendChild(button);
-        htmlList.appendChild(listItem);
+        htmlList.appendChild(button);
     }
 
     return {
         addListItem,
         loadList,
-        getAll
+        getAll,
+        loadDetails
     };
 })();
 
 // Writes the names of each pokémon to the DOM
-pokemonRespository.loadList().then(function () {
-    pokemonRespository.getAll().forEach(function(pokemon) {
+pokemonRepository.loadList().then(function () {
+    pokemonRepository.getAll().forEach(function(pokemon) {
 
-        pokemonRespository.addListItem(pokemon);
+        pokemonRepository.addListItem(pokemon);
     
     });
 });
