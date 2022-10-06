@@ -196,9 +196,10 @@ let pokemonRespository = (function() {
     function addListItem(pokemon) {
         let htmlList = document.querySelector('ul');
         let listItem = document.createElement('li');
+        listItem.classList.add('group-list-item');
         let button = document.createElement('button');
         button.innerText = `${pokemon.name}`;
-        button.classList.add('pokemon-list__pokemon-card');
+        button.classList.add('pokemon-list__pokemon-card','btn');
         // Add click event to button to show item details.
         addEvent(button, pokemon);
 

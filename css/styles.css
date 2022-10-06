@@ -34,10 +34,6 @@ p {
     margin-inline: 15px;
 }
 
-.header__logo {
-    max-width: 100px;
-}
-
 .pokemon-list {
     list-style-type: none;
     padding: 10px;
