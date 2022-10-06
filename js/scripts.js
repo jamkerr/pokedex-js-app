@@ -28,8 +28,8 @@ let detailsModal = (function() {
 
         // Add title, text, and image to DOM
         modalBody.appendChild(imageElement);
-        modalBody.appendChild(typeElement);
-        modalBody.appendChild(heightElement);
+        modalFooter.appendChild(typeElement);
+        modalFooter.appendChild(heightElement);
     }
 
     return {

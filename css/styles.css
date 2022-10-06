@@ -1,3 +1,7 @@
+:root {
+    --generic-background: #a8a878;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -29,17 +33,8 @@ main {
     justify-content: center;
 }
 
-/* .pokemon-list {
-    list-style-type: none;
-    padding: 10px;
-    display: flex;
-    flex-direction: column;
-    row-gap: 1rem;
-} */
-
 .pokemon-list__pokemon-card {
     /* Ensures button fills li */
-    /* flex-grow: 1; */
     background-image: linear-gradient(rgb(241, 225, 225), rgb(250, 204, 244));
     border: none;
     padding: 20px;
@@ -54,6 +49,16 @@ main {
     background: #fff;
 }
 
-/* .modal img {
-    float: right;
-} */
+.modal-body {
+    background-color: var(--generic-background);
+}
+
+.modal-footer {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.modal img {
+    image-rendering: pixelated;
+    width: 400px;
+}
