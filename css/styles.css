@@ -1,5 +1,27 @@
 :root {
-    --generic-background: #a8a878;
+    --background-dark: #585555;
+    --background-light: #f5f5f5;
+    --text-dark: #111111;
+    --text-light: #fff;
+
+    --normal: #a8a878;
+    --fire: #f08030;
+    --water: #6890f0;
+    --grass: #78c850;
+    --electric: #f8d030;
+    --ice: #98d8d8;
+    --fighting: #c03028;
+    --poison: #a040a0;
+    --ground: #e0c068;
+    --flying: #a890f0;
+    --psychic: #f85888;
+    --bug: #a8b820;
+    --rock: #b8a038;
+    --ghost: #705898;
+    --dark: #705848;
+    --dragon: #7038f8;
+    --steel: #b8b8d0;
+    --fairy: #f0b6bc;
 }
 
 * {
@@ -12,7 +34,7 @@ body {
     font-size: 22px;
     line-height: 1.6;
     color: #2b2b2b;
-    background-color: #f5f5f5;
+    background-color: var(--background-light);
 }
 
 /* RESET BROWSER DEFAULTS */
@@ -35,7 +57,7 @@ main {
 
 .pokemon-list__pokemon-card {
     /* Ensures button fills li */
-    background-image: linear-gradient(rgb(241, 225, 225), rgb(250, 204, 244));
+    background-image: linear-gradient(var(--water), var(--ghost));
     border: none;
     padding: 20px;
     margin: 10px;
@@ -46,19 +68,118 @@ main {
 }
 
 .modal-content {
-    background: #fff;
+    color: var(--text-dark);
+    background: var(--background-light);
 }
 
-.modal-body {
-    background-color: var(--generic-background);
+.modal-header__content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.modal-id-number {
+    margin-bottom: 0;
+}
+
+.modal-title {
+    font-weight: 700;
+}
+
+.tags__modal-type {
+    display: flex;
+    flex-direction: row;
+}
+
+.modal-tag {
+    border-radius: 4px;
+    padding: 0.1rem 0.5rem;
+    margin: 0.3rem;
+}
+
+.close-text {
+    color: var(--text-dark);
 }
 
 .modal-footer {
-    flex-direction: column;
-    align-items: flex-start;
+    justify-content: space-between;
 }
 
 .modal img {
     image-rendering: pixelated;
     width: 400px;
+}
+
+/* COLOR CLASSES */
+
+.normal {
+    background: var(--normal);
+}
+
+.fire {
+    background: var(--fire);
+}
+
+.water {
+    background: var(--water);
+}
+
+.grass {
+    background: var(--grass);
+}
+
+.electric {
+    background: var(--electric);
+}
+
+.ice {
+    background: var(--ice);
+}
+
+.fighting {
+    background: var(--fighting);
+}
+
+.poison {
+    background: var(--poison);
+}
+
+.ground {
+    background: var(--ground);
+}
+
+.flying {
+    background: var(--flying);
+}
+
+.psychic {
+    background: var(--psychic);
+}
+
+.bug {
+    background: var(--bug);
+}
+
+.rock {
+    background: var(--rock);
+}
+
+.ghost {
+    background: var(--ghost);
+}
+
+.dark {
+    background: var(--dark);
+}
+
+.dragon {
+    background: var(--dragon);
+}
+
+.steel {
+    background: var(--steel);
+}
+
+.fairy {
+    background: var(--fairy);
 }

@@ -5,31 +5,51 @@ let detailsModal = (function() {
     function showModal(pokemon) {
 
         let modalTitle = document.querySelector('.modal-title');
+        let modalTypeTags = document.querySelector('.tags__modal-type');
         let modalBody = document.querySelector('.modal-body');
         let modalFooter = document.querySelector('.modal-footer');
 
         modalBody.innerHTML = '';
         modalFooter.innerHTML = '';
+        modalTypeTags.innerHTML = '';
 
-        // Create title
+        // Create ID number
+        let idElement = document.querySelector('.modal-id-number');
+        idElement.innerText = `#${pokemon.id}`;
+
+        // Fill title
         modalTitle.innerText = pokemon.name;
 
-        // Create height content
-        let heightElement = document.createElement('p');
-        heightElement.innerText = `Height: ${pokemon.height * 10} cm`;
-
         // Create types element
-        let typeElement = document.createElement('p');
-        typeElement.innerText = `Type: ${pokemon.types}`;
+        let typeElement = document.querySelector('.tags__modal-type');
+
+        pokemon.types.forEach((type) => {
+            const typeTag = document.createElement('p');
+            typeTag.classList.add('modal-tag', type);
+            typeTag.innerText = type;
+            typeElement.appendChild(typeTag);
+          });
+
+        // Set image background
+        modalBody.className = 'modal-body';
+        modalBody.classList.add(pokemon.mainType);
 
         // Create image
         let imageElement = document.createElement('img');
         imageElement.src = pokemon.imageUrl;
 
+        // Create height content
+        let heightElement = document.createElement('p');
+        heightElement.innerText = `Height: ${pokemon.height * 10} cm`;
+
+        //Create weight content
+        let weightElement = document.createElement('p');
+        weightElement.innerText = `Weight: ${pokemon.weight / 10} kg`;
+
         // Add title, text, and image to DOM
         modalBody.appendChild(imageElement);
-        modalFooter.appendChild(typeElement);
         modalFooter.appendChild(heightElement);
+        modalFooter.appendChild(weightElement);
     }
 
     return {
@@ -177,7 +197,8 @@ let pokemonRepository = (function() {
             'btn',
             'col-12',
             'col-md-4',
-            'col-lg-3'
+            'col-lg-3',
+            pokemon.mainType
             );
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
