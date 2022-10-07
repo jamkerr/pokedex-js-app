@@ -53,6 +53,7 @@ main {
     text-align: center;
     /* Put content in vertical center */
     justify-content: center;
+    margin-top: 60px;
 }
 
 .pokemon-list__pokemon-card {
@@ -60,7 +61,9 @@ main {
     background-image: linear-gradient(var(--water), var(--ghost));
     border: none;
     padding: 20px;
-    margin: 10px;
+    margin: 20px;
+    font-weight: 700;
+    color: var(--text-light);
 }
 
 .pokemon-list__pokemon-card:hover {
