@@ -62,7 +62,7 @@ let detailsModal = (function() {
 let pokemonRepository = (function() {
     let pokemonList = [];
     // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
-    let objectKeys = ["name", "detailsUrl"];
+    let objectKeys = ['name', 'detailsUrl'];
     let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
     // Helper function to check whether required keys are in each pokémon object
@@ -81,16 +81,10 @@ let pokemonRepository = (function() {
         return pokemonList;
     }
 
-    function getSpecific(name) {
-        return pokemonList.filter(function(pokemon) {
-            return name === pokemon.name;
-        });
-    }
-
     // Adds pokémon entry to pokemonList
     function addEntry(newPokemon) {
         // Checks whether the entry is an object and includes the expected keys
-        if (typeof newPokemon === "object" && requiredKeys(newPokemon, objectKeys)) {
+        if (typeof newPokemon === 'object' && requiredKeys(newPokemon, objectKeys)) {
             return pokemonList.push(newPokemon);
         } else {
             console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
@@ -101,7 +95,7 @@ let pokemonRepository = (function() {
     function showLoadingMessage() {
         let mainContent = document.querySelector('main');
         let messageElement = document.createElement('p');
-        messageElement.innerText = `Loading the Pokédex`;
+        messageElement.innerText = 'Loading the Pokédex';
         messageElement.classList.add('loading-message');
         // Add click event to button to show item details.
         mainContent.appendChild(messageElement);
@@ -210,9 +204,9 @@ let pokemonRepository = (function() {
     }
 
   // Search through pokémon by item name
-  let searchValue = document.getElementById("searchBar");
+  let searchValue = document.getElementById('searchBar');
 
-  searchValue.addEventListener("keyup", function (e) {
+  searchValue.addEventListener('keyup', function (e) {
     let searchString = e.target.value.toLowerCase();
 
     let itemsToHide = pokemonList.filter(function (item) {
@@ -233,10 +227,10 @@ let pokemonRepository = (function() {
     });
 
     itemsToHide.map((item) => {
-      document.getElementById(item.name).classList.add("d-none");
+      document.getElementById(item.name).classList.add('d-none');
     });
     itemsToShow.map((item) => {
-      document.getElementById(item.name).classList.remove("d-none");
+      document.getElementById(item.name).classList.remove('d-none');
     });
   });
 
