@@ -186,3 +186,11 @@ main {
 .fairy {
     background: var(--fairy);
 }
+
+/* RESPONSIVE */
+@media all and (max-width: 600px) {
+    .pokemon-list__pokemon-card {
+        margin-block: 20px;
+        margin-inline: 0;
+    }
+}
