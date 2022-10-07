@@ -197,9 +197,9 @@ let pokemonRepository = (function() {
             'btn',
             'col-12',
             'col-md-4',
-            'col-lg-3',
-            pokemon.mainType
+            'col-lg-3'
             );
+        button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
 
@@ -208,6 +208,45 @@ let pokemonRepository = (function() {
 
         htmlList.appendChild(button);
     }
+
+  // Search through pokémon by item name
+  let searchValue = document.getElementById("searchBar");
+
+  searchValue.addEventListener("keyup", function (e) {
+    let searchString = e.target.value.toLowerCase();
+
+    let itemsToHide = pokemonList.filter(function (item) {
+      // FIND ALL THE ITEMS THAT DO NOT CONTAIN SEARCH KEY IN EITHER NAME OR ID
+      if (
+        !item.name.toLowerCase().includes(searchString)
+      ) {
+        return item;
+      }
+    });
+    let itemsToShow = pokemonList.filter(function (item) {
+      // FIND ALL THE ITEMS THAT CONTAIN SEARCH KEY IN EITHER NAME OR ID
+      if (
+        item.name.toLowerCase().includes(searchString)
+      ) {
+        return item;
+      }
+    });
+
+    itemsToHide.map((item) => {
+      document.getElementById(item.name).classList.add("d-none");
+    });
+    itemsToShow.map((item) => {
+      document.getElementById(item.name).classList.remove("d-none");
+    });
+  });
+
+    // Toggle search bar by clicking the search icon
+    let searchButton = document.querySelector('.search-button');
+    $(document).ready(function () {
+        $(searchButton).click(function () {
+            $('.search-bar').toggleClass('d-none');
+        });
+    });
 
     return {
         addListItem,
