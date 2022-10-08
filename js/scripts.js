@@ -107,48 +107,41 @@ let pokemonRepository = (function() {
         messageElement.parentElement.removeChild(messageElement);
     }
 
-    // Loads the name and link to more details for each pokémon
-    function loadList() {
-        showLoadingMessage();
-        return fetch(apiUrl).then(function (response) {
-            return response.json();
-        })
-        .then(function (json) {
-            hideLoadingMessage();
-            json.results.forEach(function (item) {
-                let pokemon = {
-                    // How to define these object keys using objectKeys variable? Would that make sense? Ideal would be the other way around, but that's recursive...
-                    name: capitalizeFirstLetter(item.name),
-                    detailsUrl: item.url
-                };
-                addEntry(pokemon);
-            });
-        })
-        .catch(function (e) {
-            console.error(e);
-            hideLoadingMessage();
-        })
+        // Loads the name and link to more details for each pokémon
+        function loadList() {
+            showLoadingMessage();
+            return fetch(apiUrl)
+            .then((response) => response.json())
+            .then((json) => {
+                json.results.forEach(({name, url}) => {
+                    addEntry({
+                        name: capitalizeFirstLetter(name),
+                        detailsUrl: url
+                    })
+                });
+            })
+            .catch(function (e) {
+                console.error(e);
+            })
+            .finally(function() {
+                hideLoadingMessage();
+            })
+        }
+    // Helper function to extract type info
+    function getTypes(typesObject){
+        let typesArray = [];
+        typesObject.forEach(function(item) {
+            typesArray.push(item.type.name);
+        });
+        return typesArray;
     }
 
     // Loads extra details for a pokémon
     function loadDetails(item) {
         showLoadingMessage();
-        let url = item.detailsUrl;
-        return fetch(url)
-        .then(function (response) {
-            return response.json();
-        })
+        return fetch(item.detailsUrl)
+        .then((response) => response.json())
         .then(function (details) {
-            hideLoadingMessage();
-            // Helper function to extract type info
-            function getTypes(typesObject){
-                let typesArray = [];
-                typesObject.forEach(function(item) {
-                    typesArray.push(item.type.name);
-                    
-                });
-                return typesArray;
-            }
             item.name = capitalizeFirstLetter(details.name);
             item.imageUrl = details.sprites.front_default;
             item.height = details.height;
@@ -156,18 +149,19 @@ let pokemonRepository = (function() {
             item.types = getTypes(details.types);
             item.id = details.id;
             item.mainType = item.types[0];
+            // return item;
         })
         .catch(function (e) {
-            hideLoadingMessage();
             console.error(e);
-        });
+        })
+        .finally(function() {
+            hideLoadingMessage();
+        })
     }
 
     // Function to show item details (used for button)
     function showDetails(pokemon) {
-        loadDetails(pokemon).then(function() {
-            detailsModal.showModal(pokemon);
-        });
+        detailsModal.showModal(pokemon);
     }
 
     // Function to add click event to show item details
@@ -186,12 +180,14 @@ let pokemonRepository = (function() {
         // Create the button for each entry
         let button = document.createElement('button');
         button.innerText = `${pokemon.name}`;
+        console.log(pokemon);
         button.classList.add(
             'pokemon-list__pokemon-card',
             'btn',
             'col-12',
             'col-md-4',
-            'col-lg-3'
+            'col-lg-3',
+            pokemon.mainType
             );
         button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
@@ -210,7 +206,7 @@ let pokemonRepository = (function() {
     let searchString = e.target.value.toLowerCase();
 
     let itemsToHide = pokemonList.filter(function (item) {
-      // FIND ALL THE ITEMS THAT DO NOT CONTAIN SEARCH KEY IN EITHER NAME OR ID
+      // Find non-matching names
       if (
         !item.name.toLowerCase().includes(searchString)
       ) {
@@ -218,7 +214,7 @@ let pokemonRepository = (function() {
       }
     });
     let itemsToShow = pokemonList.filter(function (item) {
-      // FIND ALL THE ITEMS THAT CONTAIN SEARCH KEY IN EITHER NAME OR ID
+      // Find matching names
       if (
         item.name.toLowerCase().includes(searchString)
       ) {
@@ -245,7 +241,8 @@ let pokemonRepository = (function() {
     return {
         addListItem,
         loadList,
-        getAll
+        getAll,
+        loadDetails
     };
 })();
 
@@ -253,10 +250,11 @@ let pokemonRepository = (function() {
 pokemonRepository.loadList().then(function () {
     pokemonRepository.getAll().forEach(function(pokemon) {
 
-        pokemonRepository.addListItem(pokemon);
+        pokemonRepository.loadDetails(pokemon)
+        .then(function() {
+            pokemonRepository.addListItem(pokemon)
+        });
     
     });
 });
-
-
 
