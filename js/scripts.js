@@ -32,7 +32,7 @@ let detailsModal = (function() {
 
         // Set image background
         modalBody.className = 'modal-body';
-        modalBody.classList.add(pokemon.mainType);
+        modalBody.classList.add(`gradient--${pokemon.mainType}`);
 
         // Create image
         let imageElement = document.createElement('img');
@@ -182,15 +182,20 @@ let pokemonRepository = (function() {
         button.classList.add(
             'pokemon-list__pokemon-card',
             'btn',
+            'shadow',
             'col-12',
             'col-md-4',
             'col-lg-3',
-            pokemon.mainType,
-            `id-${pokemon.id}`
+            `id-${pokemon.id}`,
+            `gradient--${pokemon.mainType}`
             );
         button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
+
+        // Create flex element to hold name and id elements
+        let buttonTextWrapper = document.createElement('div');
+        buttonTextWrapper.classList.add('pokemon-list__pokemon-card--text');
 
         // Create name element to include in button
         let buttonName = document.createElement('p');
@@ -207,8 +212,9 @@ let pokemonRepository = (function() {
         // Add click event to button to show item details.
         addEvent(button, pokemon);
 
-        button.appendChild(buttonName);
-        button.appendChild(buttonId);
+        buttonTextWrapper.appendChild(buttonName);
+        buttonTextWrapper.appendChild(buttonId);
+        button.appendChild(buttonTextWrapper);
         button.appendChild(buttonImage);
         htmlList.appendChild(button);
     }
