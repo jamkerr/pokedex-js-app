@@ -109,7 +109,6 @@ let pokemonRepository = (function() {
 
         // Loads the name and link to more details for each pokémon
         function loadList() {
-            showLoadingMessage();
             return fetch(apiUrl)
             .then((response) => response.json())
             .then((json) => {
@@ -123,10 +122,8 @@ let pokemonRepository = (function() {
             .catch(function (e) {
                 console.error(e);
             })
-            .finally(function() {
-                hideLoadingMessage();
-            })
         }
+
     // Helper function to extract type info
     function getTypes(typesObject){
         let typesArray = [];
@@ -138,7 +135,6 @@ let pokemonRepository = (function() {
 
     // Loads extra details for a pokémon
     function loadDetails(item) {
-        showLoadingMessage();
         return fetch(item.detailsUrl)
         .then((response) => response.json())
         .then(function (details) {
@@ -153,9 +149,6 @@ let pokemonRepository = (function() {
         })
         .catch(function (e) {
             console.error(e);
-        })
-        .finally(function() {
-            hideLoadingMessage();
         })
     }
 
@@ -262,12 +255,16 @@ let pokemonRepository = (function() {
         addListItem,
         loadList,
         getAll,
-        loadDetails
+        loadDetails,
+        showLoadingMessage,
+        hideLoadingMessage
     };
 })();
 
-// Writes the names of each pokémon to the DOM
+// Load all the data and create the card list
+pokemonRepository.showLoadingMessage();
 pokemonRepository.loadList().then(function () {
+    pokemonRepository.hideLoadingMessage();
     pokemonRepository.getAll().forEach(function(pokemon) {
 
         pokemonRepository.loadDetails(pokemon)
@@ -277,4 +274,5 @@ pokemonRepository.loadList().then(function () {
     
     });
 });
+
 
