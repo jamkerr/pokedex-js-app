@@ -178,24 +178,38 @@ let pokemonRepository = (function() {
         let htmlList = document.querySelector('.pokemon-list');
 
         // Create the button for each entry
-        let button = document.createElement('button');
-        button.innerText = `${pokemon.name}`;
-        console.log(pokemon);
+        let button = document.createElement('div');
         button.classList.add(
             'pokemon-list__pokemon-card',
             'btn',
             'col-12',
             'col-md-4',
             'col-lg-3',
-            pokemon.mainType
+            pokemon.mainType,
+            `id-${pokemon.id}`
             );
         button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
 
+        // Create name element to include in button
+        let buttonName = document.createElement('p');
+        buttonName.innerText = `${pokemon.name}`;
+
+        // Create image element to include in button
+        let buttonId = document.createElement('p');
+        buttonId.innerText = `#${pokemon.id}`;
+
+        // Create image element to include in button
+        let buttonImage = document.createElement('img');
+        buttonImage.setAttribute('src', pokemon.imageUrl);
+
         // Add click event to button to show item details.
         addEvent(button, pokemon);
 
+        button.appendChild(buttonName);
+        button.appendChild(buttonId);
+        button.appendChild(buttonImage);
         htmlList.appendChild(button);
     }
 
