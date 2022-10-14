@@ -257,7 +257,9 @@ let pokemonRepository = (function() {
     let searchButton = document.querySelector('.search-button');
     $(document).ready(function () {
         $(searchButton).click(function () {
-            $('.search-bar').toggleClass('d-none');
+            let searchBar = $('#searchBar');
+            searchBar.toggleClass('d-none');
+            searchBar.focus();
         });
     });
 
