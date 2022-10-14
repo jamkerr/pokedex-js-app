@@ -161,6 +161,10 @@ main {
     width: 400px;
 }
 
+.search-button svg path {
+    fill: var(--text-light);
+}
+
 /* COLOR CLASSES */
 
 .normal {
