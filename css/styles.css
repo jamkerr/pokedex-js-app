@@ -77,6 +77,7 @@ main {
 
 .loading-message {
     color: var(--text-dark);
+    /* height: 136px; */
 }
 
 .pokemon-list__pokemon-card {
@@ -87,6 +88,11 @@ main {
     margin: 20px;
     font-weight: 700;
     color: var(--text-light);
+}
+
+.loading-placeholder {
+    /* Fix height for empty cards */
+    height: 186px;
 }
 
 .pokemon-list__pokemon-card:hover {
