@@ -61,8 +61,9 @@ let detailsModal = (function() {
 
 let pokemonRepository = (function() {
     let pokemonList = [];
-    // objectKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
-    let objectKeys = ['name', 'detailsUrl'];
+    // basicKeys is currently used to check whether entry has expected keys, but NOT used to define the keys. This is brittle and likely to cause future bugs! Is there a better way?
+    let basicKeys = ['name', 'detailsUrl'];
+    // let detailKeys = ['sprites', 'height', 'weight', 'types', 'id'];
     let apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150';
 
     // Helper function to check whether required keys are in each pokémon object
@@ -77,38 +78,34 @@ let pokemonRepository = (function() {
         return string.charAt(0).toUpperCase() + string.slice(1);
     }
 
-    function getAll() {
+    // Returns the pokemonList
+    function getList() {
         return pokemonList;
     }
 
     // Adds pokémon entry to pokemonList
     function addEntry(newPokemon) {
         // Checks whether the entry is an object and includes the expected keys
-        if (typeof newPokemon === 'object' && requiredKeys(newPokemon, objectKeys)) {
+        if (typeof newPokemon === 'object' && requiredKeys(newPokemon, basicKeys)) {
             return pokemonList.push(newPokemon);
         } else {
-            console.log(`The pokémon must be stored as an object with the keys: ${objectKeys}.`);
+            console.log(`The pokémon must be stored as an object with the keys: ${basicKeys}.`);
         }
     }
     
-    // Shows loading message when entry or details are being fetched
-    function showLoadingMessage() {
-        let mainContent = document.querySelector('main');
-        let messageElement = document.createElement('p');
-        messageElement.innerText = 'Loading the Pokédex';
+    // Shows loading message with Pokémon's name while details are being fetched
+    function showLoadingMessage(name, index) {
+        let i = index + 1;
+        let cardContent = document.querySelector('.id-'+i);
+        let messageElement = document.createElement('div');
+        messageElement.innerText = `Loading details for ${name}`;
         messageElement.classList.add('loading-message');
         // Add click event to button to show item details.
-        mainContent.appendChild(messageElement);
-    }
-
-    // Hides loading message after entry or details have been fetched
-    function hideLoadingMessage() {
-        let messageElement = document.querySelector('.loading-message');
-        messageElement.parentElement.removeChild(messageElement);
+        cardContent.appendChild(messageElement);
     }
 
         // Loads the name and link to more details for each pokémon
-        function loadList() {
+        function createBasicList() {
             return fetch(apiUrl)
             .then((response) => response.json())
             .then((json) => {
@@ -145,7 +142,7 @@ let pokemonRepository = (function() {
             item.types = getTypes(details.types);
             item.id = details.id;
             item.mainType = item.types[0];
-            // return item;
+            return item;
         })
         .catch(function (e) {
             console.error(e);
@@ -165,8 +162,8 @@ let pokemonRepository = (function() {
         });
     }
 
-    // Create the list of buttons for each pokémon
-    function addListItem(pokemon) {
+    // Create a placeholder card with a loading message for each pokémon
+    function addCard(pokemon, i) {
         // Select the list element
         let htmlList = document.querySelector('.pokemon-list');
 
@@ -179,9 +176,25 @@ let pokemonRepository = (function() {
             'col-12',
             'col-md-4',
             'col-lg-3',
-            `id-${pokemon.id}`,
-            `gradient--${pokemon.mainType}`
+            `id-${i+1}`
             );
+
+        htmlList.appendChild(button);
+
+        // Shows loading message with Pokémon's name inside each card
+        showLoadingMessage(pokemon.name, i);
+
+    }
+
+    // Fills a card with details once they're available
+    function fillCard(pokemon) {
+
+        let button = document.querySelector(`.id-${pokemon.id}`);
+        // Remove loading message from card
+        button.innerHTML = '';
+
+        button.classList.add(`gradient--${pokemon.mainType}`);
+
         button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
@@ -209,39 +222,34 @@ let pokemonRepository = (function() {
         buttonTextWrapper.appendChild(buttonId);
         button.appendChild(buttonTextWrapper);
         button.appendChild(buttonImage);
-        htmlList.appendChild(button);
     }
 
-  // Search through pokémon by item name
-  let searchValue = document.getElementById('searchBar');
+    // Search through pokémon by item name
+    let searchValue = document.getElementById('searchBar');
 
-  searchValue.addEventListener('keyup', function (e) {
-    let searchString = e.target.value.toLowerCase();
+    searchValue.addEventListener('keyup', function (e) {
+        let searchString = e.target.value.toLowerCase();
 
-    let itemsToHide = pokemonList.filter(function (item) {
-      // Find non-matching names
-      if (
-        !item.name.toLowerCase().includes(searchString)
-      ) {
-        return item;
-      }
-    });
-    let itemsToShow = pokemonList.filter(function (item) {
-      // Find matching names
-      if (
-        item.name.toLowerCase().includes(searchString)
-      ) {
-        return item;
-      }
-    });
+        let itemsToHide = pokemonList.filter(function (item) {
+            // Find non-matching names
+            if (!item.name.toLowerCase().includes(searchString)) {
+                return item;
+            }
+        });
+        let itemsToShow = pokemonList.filter(function (item) {
+            // Find matching names
+            if (item.name.toLowerCase().includes(searchString)) {
+                return item;
+            }
+        });
 
-    itemsToHide.map((item) => {
-      document.getElementById(item.name).classList.add('d-none');
+        itemsToHide.map((item) => {
+            document.getElementById(item.name).classList.add('d-none');
+        });
+        itemsToShow.map((item) => {
+            document.getElementById(item.name).classList.remove('d-none');
+        });
     });
-    itemsToShow.map((item) => {
-      document.getElementById(item.name).classList.remove('d-none');
-    });
-  });
 
     // Toggle search bar by clicking the search icon
     let searchButton = document.querySelector('.search-button');
@@ -252,27 +260,29 @@ let pokemonRepository = (function() {
     });
 
     return {
-        addListItem,
-        loadList,
-        getAll,
-        loadDetails,
-        showLoadingMessage,
-        hideLoadingMessage
+        addCard,
+        createBasicList,
+        getList,
+        fillCard,
+        loadDetails
     };
 })();
 
-// Load all the data and create the card list
-pokemonRepository.showLoadingMessage();
-pokemonRepository.loadList().then(function () {
-    pokemonRepository.hideLoadingMessage();
-    pokemonRepository.getAll().forEach(function(pokemon) {
-
+// Load the basic data and create placeholder cards
+pokemonRepository.createBasicList()
+.then(function () {
+    pokemonRepository.getList().forEach(function(pokemon, index) {
+        pokemonRepository.addCard(pokemon, index)
+    })
+})
+// Load detailed data and fill the cards with those details
+.then(function () {
+    pokemonRepository.getList().forEach(function(pokemon){  
         pokemonRepository.loadDetails(pokemon)
-        .then(function() {
-            pokemonRepository.addListItem(pokemon)
-        });
-    
-    });
+        .then(function(pokemon){
+            pokemonRepository.fillCard(pokemon)
+        })
+    })
 });
 
 
