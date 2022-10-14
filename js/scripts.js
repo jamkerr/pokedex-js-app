@@ -94,9 +94,8 @@ let pokemonRepository = (function() {
     }
     
     // Shows loading message with Pokémon's name while details are being fetched
-    function showLoadingMessage(name, index) {
-        let i = index + 1;
-        let cardContent = document.querySelector('.id-'+i);
+    function showLoadingMessage(name) {
+        let cardContent = document.getElementById(name);
         let messageElement = document.createElement('div');
         messageElement.innerText = `Loading details for ${name}`;
         messageElement.classList.add('loading-message');
@@ -163,7 +162,7 @@ let pokemonRepository = (function() {
     }
 
     // Create a placeholder card with a loading message for each pokémon
-    function addCard(pokemon, i) {
+    function addCard(pokemon) {
         // Select the list element
         let htmlList = document.querySelector('.pokemon-list');
 
@@ -176,26 +175,25 @@ let pokemonRepository = (function() {
             'col-12',
             'col-md-4',
             'col-lg-3',
-            `id-${i+1}`
-            );
+            'loading-placeholder'
+        );
+
+        button.setAttribute('id', pokemon.name);
 
         htmlList.appendChild(button);
 
         // Shows loading message with Pokémon's name inside each card
-        showLoadingMessage(pokemon.name, i);
+        showLoadingMessage(pokemon.name);
 
     }
 
     // Fills a card with details once they're available
     function fillCard(pokemon) {
 
-        let button = document.querySelector(`.id-${pokemon.id}`);
-        // Remove loading message from card
-        button.innerHTML = '';
+        let button = document.getElementById(pokemon.name);
 
         button.classList.add(`gradient--${pokemon.mainType}`);
 
-        button.setAttribute('id', pokemon.name);
         button.setAttribute('data-toggle', 'modal');
         button.setAttribute('data-target', '#pokemodal');
 
@@ -220,6 +218,10 @@ let pokemonRepository = (function() {
 
         buttonTextWrapper.appendChild(buttonName);
         buttonTextWrapper.appendChild(buttonId);
+        // Remove loading message from card
+        button.innerHTML = '';
+        // Remove fixed height for empty card
+        button.classList.remove('loading-placeholder');
         button.appendChild(buttonTextWrapper);
         button.appendChild(buttonImage);
     }
@@ -271,8 +273,8 @@ let pokemonRepository = (function() {
 // Load the basic data and create placeholder cards
 pokemonRepository.createBasicList()
 .then(function () {
-    pokemonRepository.getList().forEach(function(pokemon, index) {
-        pokemonRepository.addCard(pokemon, index)
+    pokemonRepository.getList().forEach(function(pokemon) {
+        pokemonRepository.addCard(pokemon)
     })
 })
 // Load detailed data and fill the cards with those details
