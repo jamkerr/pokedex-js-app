@@ -3,6 +3,10 @@
 A simple app using vanilla JavaScript, Bootstrap, and a tiiiiny bit of jQuery to search and display Pokédex entries.
 
 It displays the classic 150 Pokémon, so that you can feel 10 years old again :)
+
+# Screenshot
+
+![A screenshot while hovering over Charmeleon](./img/screenshot-focus-charmeleon.png)
 # How to run the app
 
 Just open the `index.html` file in your browser.
